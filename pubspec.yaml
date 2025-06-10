@@ -1,0 +1,27 @@
+name: server_parts_management
+description: 服务器配件管理系统
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  provider: ^6.0.5
+  mysql1: ^0.20.0
+  path_provider: ^2.1.1
+  file_picker: ^6.1.1
+  universal_html: ^2.2.4
+  intl: ^0.18.1
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true 

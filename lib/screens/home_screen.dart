@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/inventory_provider.dart';
+import '../providers/preference_provider.dart';
 import 'part_management_screen.dart';
 import 'server_management_screen.dart';
 import 'inventory_report_screen.dart';
 import 'server_assembly_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<InventoryProvider>(context, listen: false).loadInventory();
+      Provider.of<PreferenceProvider>(context, listen: false).loadAllPreferences();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

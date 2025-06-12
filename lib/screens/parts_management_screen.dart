@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:server_parts_management/models/server.dart';
+import 'package:server_parts_management/models/part.dart';
 import 'package:server_parts_management/providers/inventory_provider.dart';
-import 'package:server_parts_management/widgets/server_form.dart';
+import 'package:server_parts_management/widgets/part_form.dart';
 
-class ServerManagementScreen extends StatelessWidget {
-  const ServerManagementScreen({super.key});
+class PartsManagementScreen extends StatelessWidget {
+  const PartsManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class ServerManagementScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    '服务器管理',
+                    '配件管理',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -31,16 +31,16 @@ class ServerManagementScreen extends StatelessWidget {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('添加服务器'),
+                          title: const Text('添加配件'),
                           content: SingleChildScrollView(
-                            child: ServerForm(
-                              onSubmit: (server) async {
+                            child: PartForm(
+                              onSubmit: (part) async {
                                 try {
-                                  await provider.addServer(server);
+                                  await provider.addPart(part);
                                   Navigator.pop(context);
                                 } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('添加服务器失败: $e')),
+                                    SnackBar(content: Text('添加配件失败: $e')),
                                   );
                                 }
                               },
@@ -50,7 +50,7 @@ class ServerManagementScreen extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.add),
-                    label: const Text('添加服务器'),
+                    label: const Text('添加配件'),
                   ),
                 ],
               ),
@@ -62,18 +62,20 @@ class ServerManagementScreen extends StatelessWidget {
                     child: DataTable(
                       columns: const [
                         DataColumn(label: Text('序列号')),
+                        DataColumn(label: Text('类型')),
                         DataColumn(label: Text('型号')),
+                        DataColumn(label: Text('数量')),
                         DataColumn(label: Text('状态')),
-                        DataColumn(label: Text('配件数量')),
                         DataColumn(label: Text('操作')),
                       ],
-                      rows: provider.servers.map((server) {
+                      rows: provider.parts.map((part) {
                         return DataRow(
                           cells: [
-                            DataCell(Text(server.serialNumber)),
-                            DataCell(Text(server.model)),
-                            DataCell(Text(server.currentStatus)),
-                            DataCell(Text(server.partSerialNumbers.length.toString())),
+                            DataCell(Text(part.serialNumber)),
+                            DataCell(Text(part.typeName ?? '')),
+                            DataCell(Text(part.model)),
+                            DataCell(Text(part.quantity.toString())),
+                            DataCell(Text(part.statusName ?? '')),
                             DataCell(
                               Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -84,17 +86,17 @@ class ServerManagementScreen extends StatelessWidget {
                                       showDialog(
                                         context: context,
                                         builder: (context) => AlertDialog(
-                                          title: const Text('编辑服务器'),
+                                          title: const Text('编辑配件'),
                                           content: SingleChildScrollView(
-                                            child: ServerForm(
-                                              server: server,
-                                              onSubmit: (updatedServer) async {
+                                            child: PartForm(
+                                              part: part,
+                                              onSubmit: (updatedPart) async {
                                                 try {
-                                                  await provider.updateServer(updatedServer);
+                                                  await provider.updatePart(updatedPart);
                                                   Navigator.pop(context);
                                                 } catch (e) {
                                                   ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text('更新服务器失败: $e')),
+                                                    SnackBar(content: Text('更新配件失败: $e')),
                                                   );
                                                 }
                                               },
@@ -106,35 +108,17 @@ class ServerManagementScreen extends StatelessWidget {
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text('确认删除'),
-                                          content: Text('确定要删除服务器 ${server.serialNumber} 吗？'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(context),
-                                              child: const Text('取消'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () async {
-                                                try {
-                                                  await provider.deleteServer(server.id!);
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(content: Text('服务器已删除')),
-                                                  );
-                                                } catch (e) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text('删除服务器失败: $e')),
-                                                  );
-                                                }
-                                              },
-                                              child: const Text('删除'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
+                                    onPressed: () async {
+                                      try {
+                                        await provider.deletePart(part.id!);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('配件已删除')),
+                                        );
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('删除配件失败: $e')),
+                                        );
+                                      }
                                     },
                                   ),
                                 ],

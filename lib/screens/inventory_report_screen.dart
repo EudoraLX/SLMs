@@ -27,7 +27,7 @@ class InventoryReportScreen extends StatelessWidget {
         // 统计服务器制造商分布
         final serverManuMap = <String, int>{};
         for (var s in servers) {
-          serverManuMap[s.manufacturer ?? '未知'] = (serverManuMap[s.manufacturer ?? '未知'] ?? 0) + (s.quantity ?? 0);
+          serverManuMap[s.manufacturerName ?? '未知'] = (serverManuMap[s.manufacturerName ?? '未知'] ?? 0) + (s.quantity ?? 0);
         }
         // 统计库存状态分布
         final statusMap = <String, int>{};
@@ -35,7 +35,7 @@ class InventoryReportScreen extends StatelessWidget {
           statusMap[p.statusName ?? '未知'] = (statusMap[p.statusName ?? '未知'] ?? 0) + (p.quantity ?? 0);
         }
         for (var s in servers) {
-          statusMap[s.currentStatus ?? '未知'] = (statusMap[s.currentStatus ?? '未知'] ?? 0) + (s.quantity ?? 0);
+          statusMap[s.statusName ?? '未知'] = (statusMap[s.statusName ?? '未知'] ?? 0) + (s.quantity ?? 0);
         }
 
         return SingleChildScrollView(
@@ -62,38 +62,6 @@ class InventoryReportScreen extends StatelessWidget {
                       sections: _createPieChartSections(partTypeMap),
                       sectionsSpace: 2,
                       centerSpaceRadius: 40,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text('服务器制造商分布', style: Theme.of(context).textTheme.titleMedium),
-                SizedBox(
-                  height: 300,
-                  child: BarChart(
-                    BarChartData(
-                      alignment: BarChartAlignment.spaceAround,
-                      maxY: (serverManuMap.values.isEmpty ? 1 : serverManuMap.values.reduce((a, b) => a > b ? a : b)).toDouble() + 2,
-                      barTouchData: BarTouchData(enabled: false),
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (double value, TitleMeta meta) {
-                              final index = value.toInt();
-                              if (index < 0 || index >= serverManuMap.keys.length) return const SizedBox();
-                              return SideTitleWidget(
-                                axisSide: meta.axisSide,
-                                child: Text(serverManuMap.keys.elementAt(index)),
-                              );
-                            },
-                          ),
-                        ),
-                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      ),
-                      borderData: FlBorderData(show: false),
-                      barGroups: _createBarGroups(serverManuMap),
                     ),
                   ),
                 ),
@@ -157,23 +125,6 @@ class InventoryReportScreen extends StatelessWidget {
         title: e.key,
         radius: 80,
         titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
-      );
-    }).toList();
-  }
-
-  List<BarChartGroupData> _createBarGroups(Map<String, int> data) {
-    int i = 0;
-    return data.entries.map((e) {
-      return BarChartGroupData(
-        x: i++,
-        barRods: [
-          BarChartRodData(
-            toY: e.value.toDouble(),
-            color: Colors.blue,
-            width: 24,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
       );
     }).toList();
   }

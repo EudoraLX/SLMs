@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:server_parts_management/models/part.dart';
 import 'package:server_parts_management/providers/inventory_provider.dart';
+import 'package:server_parts_management/providers/preference_provider.dart';
 
 class PartForm extends StatefulWidget {
   final Part? part;
@@ -31,14 +32,6 @@ class _PartFormState extends State<PartForm> {
   late TextEditingController _currentServerIdController;
   late DateTime _purchaseDate;
   late DateTime _lastModifiedDate;
-
-  // 预选项列表
-  final List<String> _partTypes = ['CPU', '内存', '存储', '电源', '主板', '网卡', '显卡', '散热器', '机箱'];
-  final List<String> _manufacturers = ['Intel', 'AMD', 'Samsung', 'Dell', 'HPE', 'Lenovo', 'Cisco', 'NVIDIA', '其他'];
-  final List<String> _locations = ['仓库A', '仓库B', '仓库C', '维修区', '展示区'];
-  final List<String> _suppliers = ['Intel官方', 'AMD官方', 'Samsung官方', 'Dell官方', 'HPE官方', 'Lenovo官方', '其他'];
-  final List<String> _warrantyPeriods = ['1年', '2年', '3年', '5年', '终身'];
-  final List<String> _statuses = ['In Stock', 'In Use', 'Sold', 'Repair', 'Scrapped'];
 
   @override
   void initState() {
@@ -80,39 +73,9 @@ class _PartFormState extends State<PartForm> {
     super.dispose();
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      final part = Part(
-        id: widget.part?.id,
-        serialNumber: _serialNumberController.text,
-        typeId: 0, // 需要从预选项获取id
-        typeName: _typeController.text,
-        model: _modelController.text,
-        manufacturerId: 0, // 需要从预选项获取id
-        manufacturerName: _manufacturerController.text,
-        specifications: _specificationsController.text,
-        purchaseCost: double.parse(_purchaseCostController.text),
-        sellingPrice: double.parse(_sellingPriceController.text),
-        quantity: int.parse(_quantityController.text),
-        locationId: 0, // 需要从预选项获取id
-        locationName: _locationController.text,
-        supplierId: 0, // 需要从预选项获取id
-        supplierName: _supplierController.text,
-        warrantyId: 0, // 需要从预选项获取id
-        warrantyName: _warrantyController.text,
-        statusId: 0, // 需要从预选项获取id
-        statusName: _currentStatusController.text,
-        sourceServerId: int.tryParse(_sourceServerIdController.text),
-        currentServerId: int.tryParse(_currentServerIdController.text),
-        purchaseDate: _purchaseDate,
-        lastModifiedDate: _lastModifiedDate,
-      );
-      widget.onSubmit(part);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final preferenceProvider = Provider.of<PreferenceProvider>(context);
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -126,17 +89,18 @@ class _PartFormState extends State<PartForm> {
               validator: (value) => value?.isEmpty ?? true ? '请输入序列号' : null,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _typeController.text.isEmpty ? null : _typeController.text,
+            DropdownButtonFormField<int>(
+              value: widget.part?.typeId,
               decoration: const InputDecoration(labelText: '类型'),
-              items: _partTypes.map((type) => DropdownMenuItem(
-                value: type,
-                child: Text(type),
-              )).toList(),
+              items: preferenceProvider.partTypes
+                .map<DropdownMenuItem<int>>((type) => DropdownMenuItem<int>(
+                  value: type['id'] as int,
+                  child: Text(type['name']),
+                )).toList(),
               onChanged: (value) {
-                if (value != null) {
-                  _typeController.text = value;
-                }
+                setState(() {
+                  _typeController.text = preferenceProvider.partTypes.firstWhere((t) => t['id'] == value)['name'];
+                });
               },
               validator: (value) => value == null ? '请选择类型' : null,
             ),
@@ -147,17 +111,18 @@ class _PartFormState extends State<PartForm> {
               validator: (value) => value?.isEmpty ?? true ? '请输入型号' : null,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _manufacturerController.text.isEmpty ? null : _manufacturerController.text,
+            DropdownButtonFormField<int>(
+              value: widget.part?.manufacturerId,
               decoration: const InputDecoration(labelText: '制造商'),
-              items: _manufacturers.map((manufacturer) => DropdownMenuItem(
-                value: manufacturer,
-                child: Text(manufacturer),
-              )).toList(),
+              items: preferenceProvider.manufacturers
+                .map<DropdownMenuItem<int>>((m) => DropdownMenuItem<int>(
+                  value: m['id'] as int,
+                  child: Text(m['name']),
+                )).toList(),
               onChanged: (value) {
-                if (value != null) {
-                  _manufacturerController.text = value;
-                }
+                setState(() {
+                  _manufacturerController.text = preferenceProvider.manufacturers.firstWhere((m) => m['id'] == value)['name'];
+                });
               },
               validator: (value) => value == null ? '请选择制造商' : null,
             ),
@@ -190,64 +155,68 @@ class _PartFormState extends State<PartForm> {
               validator: (value) => value?.isEmpty ?? true ? '请输入数量' : null,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _locationController.text.isEmpty ? null : _locationController.text,
+            DropdownButtonFormField<int>(
+              value: widget.part?.locationId,
               decoration: const InputDecoration(labelText: '位置'),
-              items: _locations.map((location) => DropdownMenuItem(
-                value: location,
-                child: Text(location),
-              )).toList(),
+              items: preferenceProvider.locations
+                .map<DropdownMenuItem<int>>((l) => DropdownMenuItem<int>(
+                  value: l['id'] as int,
+                  child: Text(l['name']),
+                )).toList(),
               onChanged: (value) {
-                if (value != null) {
-                  _locationController.text = value;
-                }
+                setState(() {
+                  _locationController.text = preferenceProvider.locations.firstWhere((l) => l['id'] == value)['name'];
+                });
               },
               validator: (value) => value == null ? '请选择位置' : null,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _supplierController.text.isEmpty ? null : _supplierController.text,
+            DropdownButtonFormField<int>(
+              value: widget.part?.supplierId,
               decoration: const InputDecoration(labelText: '供应商'),
-              items: _suppliers.map((supplier) => DropdownMenuItem(
-                value: supplier,
-                child: Text(supplier),
-              )).toList(),
+              items: preferenceProvider.suppliers
+                .map<DropdownMenuItem<int>>((s) => DropdownMenuItem<int>(
+                  value: s['id'] as int,
+                  child: Text(s['name']),
+                )).toList(),
               onChanged: (value) {
-                if (value != null) {
-                  _supplierController.text = value;
-                }
+                setState(() {
+                  _supplierController.text = preferenceProvider.suppliers.firstWhere((s) => s['id'] == value)['name'];
+                });
               },
               validator: (value) => value == null ? '请选择供应商' : null,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _warrantyController.text.isEmpty ? null : _warrantyController.text,
+            DropdownButtonFormField<int>(
+              value: widget.part?.warrantyId,
               decoration: const InputDecoration(labelText: '保修期'),
-              items: _warrantyPeriods.map((warranty) => DropdownMenuItem(
-                value: warranty,
-                child: Text(warranty),
-              )).toList(),
+              items: preferenceProvider.warrantyPeriods
+                .map<DropdownMenuItem<int>>((w) => DropdownMenuItem<int>(
+                  value: w['id'] as int,
+                  child: Text(w['name']),
+                )).toList(),
               onChanged: (value) {
-                if (value != null) {
-                  _warrantyController.text = value;
-                }
+                setState(() {
+                  _warrantyController.text = preferenceProvider.warrantyPeriods.firstWhere((w) => w['id'] == value)['name'];
+                });
               },
               validator: (value) => value == null ? '请选择保修期' : null,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _currentStatusController.text.isEmpty ? null : _currentStatusController.text,
-              decoration: const InputDecoration(labelText: '当前状态'),
-              items: _statuses.map((status) => DropdownMenuItem(
-                value: status,
-                child: Text(status),
-              )).toList(),
+            DropdownButtonFormField<int>(
+              value: widget.part?.statusId,
+              decoration: const InputDecoration(labelText: '状态'),
+              items: preferenceProvider.statusTypes
+                .map<DropdownMenuItem<int>>((st) => DropdownMenuItem<int>(
+                  value: st['id'] as int,
+                  child: Text(st['name']),
+                )).toList(),
               onChanged: (value) {
-                if (value != null) {
-                  _currentStatusController.text = value;
-                }
+                setState(() {
+                  _currentStatusController.text = preferenceProvider.statusTypes.firstWhere((st) => st['id'] == value)['name'];
+                });
               },
-              validator: (value) => value == null ? '请选择当前状态' : null,
+              validator: (value) => value == null ? '请选择状态' : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -283,11 +252,43 @@ class _PartFormState extends State<PartForm> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _submitForm,
-              child: Text(widget.part == null ? '添加配件' : '更新配件'),
+              child: const Text('提交'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      final preferenceProvider = Provider.of<PreferenceProvider>(context, listen: false);
+      final part = Part(
+        id: widget.part?.id,
+        serialNumber: _serialNumberController.text,
+        typeId: preferenceProvider.partTypes.firstWhere((t) => t['name'] == _typeController.text)['id'],
+        typeName: _typeController.text,
+        model: _modelController.text,
+        manufacturerId: preferenceProvider.manufacturers.firstWhere((m) => m['name'] == _manufacturerController.text)['id'],
+        manufacturerName: _manufacturerController.text,
+        specifications: _specificationsController.text,
+        purchaseCost: double.parse(_purchaseCostController.text),
+        sellingPrice: double.parse(_sellingPriceController.text),
+        quantity: int.parse(_quantityController.text),
+        locationId: preferenceProvider.locations.firstWhere((l) => l['name'] == _locationController.text)['id'],
+        locationName: _locationController.text,
+        supplierId: preferenceProvider.suppliers.firstWhere((s) => s['name'] == _supplierController.text)['id'],
+        supplierName: _supplierController.text,
+        warrantyId: preferenceProvider.warrantyPeriods.firstWhere((w) => w['name'] == _warrantyController.text)['id'],
+        warrantyName: _warrantyController.text,
+        statusId: preferenceProvider.statusTypes.firstWhere((st) => st['name'] == _currentStatusController.text)['id'],
+        statusName: _currentStatusController.text,
+        sourceServerId: int.tryParse(_sourceServerIdController.text),
+        currentServerId: int.tryParse(_currentServerIdController.text),
+        purchaseDate: _purchaseDate,
+        lastModifiedDate: _lastModifiedDate,
+      );
+      widget.onSubmit(part);
+    }
   }
 } 

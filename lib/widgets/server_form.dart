@@ -39,15 +39,15 @@ class _ServerFormState extends State<ServerForm> {
     super.initState();
     _serialNumberController = TextEditingController(text: widget.server?.serialNumber ?? '');
     _modelController = TextEditingController(text: widget.server?.model ?? '');
-    _manufacturerController = TextEditingController(text: widget.server?.manufacturer ?? '');
+    _manufacturerController = TextEditingController(text: widget.server?.manufacturerName ?? '');
     _specificationsController = TextEditingController(text: widget.server?.specifications ?? '');
     _purchaseCostController = TextEditingController(text: widget.server?.purchaseCost.toString() ?? '');
     _sellingPriceController = TextEditingController(text: widget.server?.sellingPrice.toString() ?? '');
     _quantityController = TextEditingController(text: widget.server?.quantity.toString() ?? '');
-    _locationController = TextEditingController(text: widget.server?.location ?? '');
-    _supplierController = TextEditingController(text: widget.server?.supplier ?? '');
-    _warrantyController = TextEditingController(text: widget.server?.warranty ?? '');
-    _currentStatusController = TextEditingController(text: widget.server?.currentStatus ?? '');
+    _locationController = TextEditingController(text: widget.server?.locationName ?? '');
+    _supplierController = TextEditingController(text: widget.server?.supplierName ?? '');
+    _warrantyController = TextEditingController(text: widget.server?.warrantyName ?? '');
+    _currentStatusController = TextEditingController(text: widget.server?.statusName ?? '');
     _assemblyDateController = TextEditingController(
       text: widget.server?.assemblyDate.toIso8601String().split('T')[0] ?? DateTime.now().toIso8601String().split('T')[0],
     );
@@ -77,15 +77,20 @@ class _ServerFormState extends State<ServerForm> {
         id: widget.server?.id,
         serialNumber: _serialNumberController.text,
         model: _modelController.text,
-        manufacturer: _manufacturerController.text,
+        manufacturerId: 0, // 需从下拉框获取
+        manufacturerName: _manufacturerController.text,
         specifications: _specificationsController.text,
         purchaseCost: double.parse(_purchaseCostController.text),
         sellingPrice: double.parse(_sellingPriceController.text),
         quantity: int.parse(_quantityController.text),
-        location: _locationController.text,
-        supplier: _supplierController.text,
-        warranty: _warrantyController.text,
-        currentStatus: _currentStatusController.text,
+        locationId: 0, // 需从下拉框获取
+        locationName: _locationController.text,
+        supplierId: 0, // 需从下拉框获取
+        supplierName: _supplierController.text,
+        warrantyId: 0, // 需从下拉框获取
+        warrantyName: _warrantyController.text,
+        statusId: 0, // 需从下拉框获取
+        statusName: _currentStatusController.text,
         assemblyDate: DateTime.parse(_assemblyDateController.text),
         partSerialNumbers: _selectedPartSerialNumbers.join(','),
         lastModifiedDate: DateTime.now(),

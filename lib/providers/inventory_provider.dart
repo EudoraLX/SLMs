@@ -103,15 +103,20 @@ class InventoryProvider with ChangeNotifier {
       id: id,
       serialNumber: server.serialNumber,
       model: server.model,
-      manufacturer: server.manufacturer,
+      manufacturerId: server.manufacturerId,
+      manufacturerName: server.manufacturerName,
       specifications: server.specifications,
       purchaseCost: server.purchaseCost,
       sellingPrice: server.sellingPrice,
       quantity: server.quantity,
-      location: server.location,
-      supplier: server.supplier,
-      warranty: server.warranty,
-      currentStatus: server.currentStatus,
+      locationId: server.locationId,
+      locationName: server.locationName,
+      supplierId: server.supplierId,
+      supplierName: server.supplierName,
+      warrantyId: server.warrantyId,
+      warrantyName: server.warrantyName,
+      statusId: server.statusId,
+      statusName: server.statusName,
       assemblyDate: server.assemblyDate,
       partSerialNumbers: server.partSerialNumbers,
       lastModifiedDate: server.lastModifiedDate,
@@ -219,15 +224,20 @@ class InventoryProvider with ChangeNotifier {
           id: server.id,
           serialNumber: server.serialNumber,
           model: server.model,
-          manufacturer: server.manufacturer,
+          manufacturerId: server.manufacturerId,
+          manufacturerName: server.manufacturerName,
           specifications: server.specifications,
           purchaseCost: server.purchaseCost,
           sellingPrice: server.sellingPrice,
           quantity: server.quantity,
-          location: server.location,
-          supplier: server.supplier,
-          warranty: server.warranty,
-          currentStatus: newStatus,
+          locationId: server.locationId,
+          locationName: server.locationName,
+          supplierId: server.supplierId,
+          supplierName: server.supplierName,
+          warrantyId: server.warrantyId,
+          warrantyName: server.warrantyName,
+          statusId: server.statusId,
+          statusName: newStatus,
           assemblyDate: server.assemblyDate,
           lastModifiedDate: DateTime.now(),
           partSerialNumbers: server.partSerialNumbers,
@@ -274,12 +284,12 @@ class InventoryProvider with ChangeNotifier {
 
   // 获取库存中的服务器
   List<Server> getInStockServers() {
-    return _servers.where((server) => server.currentStatus == 'In Stock').toList();
+    return _servers.where((server) => server.statusName == 'In Stock').toList();
   }
 
   // 获取已售出的服务器
   List<Server> getSoldServers() {
-    return _servers.where((server) => server.currentStatus == 'Sold').toList();
+    return _servers.where((server) => server.statusName == 'Sold').toList();
   }
 
   // 计算总库存价值
@@ -289,7 +299,7 @@ class InventoryProvider with ChangeNotifier {
         .fold(0.0, (sum, part) => sum + part.purchaseCost);
     
     double serversValue = _servers
-        .where((server) => server.currentStatus == 'In Stock')
+        .where((server) => server.statusName == 'In Stock')
         .fold(0.0, (sum, server) => sum + server.purchaseCost);
     
     return partsValue + serversValue;
@@ -308,7 +318,7 @@ class InventoryProvider with ChangeNotifier {
     }
     
     // 计算已售出服务器的利润
-    for (var server in _servers.where((s) => s.currentStatus == 'Sold')) {
+    for (var server in _servers.where((s) => s.statusName == 'Sold')) {
       // 从销售记录中获取销售价格
       // 暂时使用采购成本的1.3倍作为销售价格
       double salePrice = server.purchaseCost * 1.3;

@@ -72,7 +72,7 @@ class ServerManagementScreen extends StatelessWidget {
                           cells: [
                             DataCell(Text(server.serialNumber)),
                             DataCell(Text(server.model)),
-                            DataCell(Text(server.currentStatus)),
+                            DataCell(Text(server.statusName ?? '')),
                             DataCell(Text(server.partSerialNumbers.length.toString())),
                             DataCell(
                               Row(

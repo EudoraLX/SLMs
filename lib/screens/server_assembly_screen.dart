@@ -29,11 +29,11 @@ class ServerAssemblyScreen extends StatelessWidget {
               final server = servers[index];
               return ListTile(
                 title: Text(server.model),
-                subtitle: Text('${server.serialNumber} - ${server.manufacturer}'),
+                subtitle: Text('${server.serialNumber} - ${server.manufacturerName ?? ''}'),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(server.currentStatus),
+                    Text(server.statusName ?? ''),
                     IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () => _showServerDialog(context, inventoryProvider, server),
@@ -114,15 +114,15 @@ class ServerAssemblyScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('序列号: ${server.serialNumber}'),
-              Text('制造商: ${server.manufacturer}'),
+              Text('制造商: ${server.manufacturerName ?? ''}'),
               Text('规格: ${server.specifications}'),
               Text('采购成本: ${server.purchaseCost}'),
               Text('销售价格: ${server.sellingPrice}'),
               Text('数量: ${server.quantity}'),
-              Text('位置: ${server.location}'),
-              Text('供应商: ${server.supplier}'),
-              Text('保修期: ${server.warranty}'),
-              Text('当前状态: ${server.currentStatus}'),
+              Text('位置: ${server.locationName ?? ''}'),
+              Text('供应商: ${server.supplierName ?? ''}'),
+              Text('保修期: ${server.warrantyName ?? ''}'),
+              Text('当前状态: ${server.statusName ?? ''}'),
               Text('组装日期: ${server.assemblyDate.toIso8601String().split('T')[0]}'),
               Text('最后修改日期: ${server.lastModifiedDate.toIso8601String().split('T')[0]}'),
               const SizedBox(height: 16),
